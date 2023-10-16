@@ -32,17 +32,16 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class Reader {
-    private static boolean baseItemsRead;
-    private static boolean craftableItemsRead;
-    private static boolean storeRead;
-    private static boolean playerRead;
+    private static boolean baseItemsRead = false;
+    private static boolean craftableItemsRead = false;
+    private static boolean storeRead = false;
+    private static boolean playerRead = false;
 
-    static {
-        baseItemsRead = false;
-        craftableItemsRead = false;
-        storeRead = false;
-        playerRead = false;
-    }
+    private static final String BASE_ITEMS_HEADER = "base items";
+    private static final String CRAFTABLE_ITEMS_HEADER = "craftable items";
+    private static final String STORE_HEADER = "store";
+    private static final String PLAYER_HEADER = "player";
+
 
     public static App read(String filePath) {
         File file = new File(filePath);
@@ -56,25 +55,29 @@ public class Reader {
 
         ArrayList<ItemDefinition> itemDefinitions = ItemDictionary.get().getDefs();
         Storage store = null;
-        Player player = null;
-
+        //Player player = null;
         String line = "";
+
         while (scanner.hasNextLine()) {
             line = scanner.nextLine();
             if (!line.isEmpty() && line.charAt(0) == '-') {
-                if (line.endsWith("base items")) {
+                if (line.endsWith(BASE_ITEMS_HEADER)) {
                     readBaseItemDefinitions(scanner, itemDefinitions);
-                } else if (line.endsWith("craftable items")) {
+                } else if (line.endsWith(CRAFTABLE_ITEMS_HEADER)) {
                     readCraftableItemDefinitions(scanner, itemDefinitions);
-                } else if (line.endsWith("store")) {
+                } else if (line.endsWith(STORE_HEADER)) {
                     store = readStorage(scanner, itemDefinitions);
-                } else if (line.endsWith("player")) {
-                    player = readPlayer(scanner, itemDefinitions);
+                } else if (line.endsWith(PLAYER_HEADER)) {
+                    Player player = readPlayer(scanner, itemDefinitions);
+                    new App(player, store);
+                }
+                else if (line.endsWith("oplayer")) {
+                    Player player1 = readPlayer(scanner, itemDefinitions);
+                    new App(player1, store);
                 }
             }
         }
-
-        return new App(player, store);
+        return null;
     }
 
     private static boolean duplicateItemName(String name, ArrayList<ItemDefinition> defs) {
@@ -97,28 +100,39 @@ public class Reader {
         return result;
     }
 
+    private static String parseString(String str_value){
+        return str_value.trim();
+    }
+
+    private static Double parseDouble(String double_value){
+        return Double.parseDouble(double_value.trim());
+    }
+
+    private static Integer parseInteger(String integer_value){
+        return Integer.valueOf(integer_value.trim());
+    }
+
+
     // line format
     // {NAME}, {DESCRIPTION}, {WEIGHT}, ...
     private static void readBaseItemDefinitions(Scanner sc, ArrayList<ItemDefinition> defs) {
         if (Reader.baseItemsRead) {
-            System.err.println("Base Items in data file are not stored together");
-            System.exit(0);
+            throw new IllegalStateException("Base Items in data file are not stored together");
         }
         Reader.baseItemsRead = true;
-
+        
         String itemLine = sc.nextLine();
         do {
             String[] parts = itemLine.split(",");
-            
-            String name = parts[0].trim();
+
+            String name = parseString(parts[0]);
+            String description = parseString(parts[1]);
+            double weight = parseDouble(parts[2]);
+
             // Disallow duplicate item names
             if (Reader.duplicateItemName(name, defs)) {
-                String err = String.format("The item name '%s' is used multiple times", name);
-                System.err.println(err);
-                System.exit(0);
+                throw new IllegalStateException("The item name" + name + "is used multiple times");
             }
-            String description = parts[1].trim();
-            double weight = Double.valueOf(parts[2].trim());
 
             ItemDefinition def = new ItemDefinition(name, description, Optional.of(weight), new String[0]);
             defs.add(def);
@@ -131,8 +145,7 @@ public class Reader {
     // {NAME}, {DESCRIPTION}, {COMPONENT 1}, {COMPONENT 2}, ...
     private static void readCraftableItemDefinitions(Scanner sc, ArrayList<ItemDefinition> defs) {
         if (Reader.craftableItemsRead) {
-            System.err.println("Craftable Items in data file are not stored together");
-            System.exit(0);
+            throw new IllegalStateException("Craftable in data file are not stored together");
         }
         Reader.craftableItemsRead = true;
 
@@ -140,24 +153,20 @@ public class Reader {
         do {
             String[] parts = itemLine.split(",");
             
-            String name = parts[0].trim();
+            String name = parseString(parts[0]);
+            String description = parseString(parts[1]);
+            String[] components = new String[parts.length - 2];
+
+            for (int i = 2; i < parts.length; i++) {
+                components[i - 2] = parseString(parts[i]);
+            }
+
             // Disallow duplicate item names
             if (Reader.duplicateItemName(name, defs)) {
-                String err = String.format("The item '%s' is defined multiple times", name);
-                System.err.println(err);
-                System.exit(0);
+                throw new IllegalStateException("The item"+name+"is defined multiple times");
             }
-            String description = parts[1].trim();
 
-            // 
-
-            String[] components = new String[parts.length - 2];
-            for (int i = 2; i < parts.length; i++) {
-                components[i - 2] = parts[i].trim();
-            }
-            
             ItemDefinition itemDefinition = new ItemDefinition(name, description, Optional.empty(), components);
-            
             defs.add(itemDefinition);
             itemLine = sc.nextLine();
         } while (sc.hasNextLine() && !itemLine.isEmpty());
@@ -167,8 +176,7 @@ public class Reader {
     // line format: {STORAGE NAME}, {ITEM NAME}, {QTY}, {ITEM NAME}, {QTY}, ...
     private static Storage readStorage(Scanner sc, ArrayList<ItemDefinition> itemDefinitions) {
         if (Reader.storeRead) {
-            System.err.println("Store written twice or more in data file");
-            System.exit(0);
+            throw new IllegalStateException("Store written twice or more in data file");
         }
         Reader.storeRead = true;
 
@@ -180,11 +188,10 @@ public class Reader {
 
     // line format; {WEIGHT CAPACITY}, {ITEM NAME}, {QTY}, {ITEM NAME}, {QTY}, ...
     private static Player readPlayer(Scanner sc, ArrayList<ItemDefinition> items) {
-        if (Reader.playerRead) {
-            System.err.println("Player written twice or more in data file");
-            System.exit(0);
-        }
-        Reader.playerRead = true;
+        // if (Reader.playerRead) {
+        //     throw new IllegalStateException("Player written twice or more in data file");
+        // }
+        // Reader.playerRead = true;
 
         String name = System.getProperty("user.name");
         double carryCapacity = Double.valueOf(sc.nextLine());
@@ -198,17 +205,14 @@ public class Reader {
      * @param data - The result of splitting the `player` or `store` line of the config by ","
      * @return
      */
-    private static Inventory readStartingItems(
-        Scanner sc,
-        ArrayList<ItemDefinition> itemDefinitions
-    ) {
+    private static Inventory readStartingItems(Scanner sc, ArrayList<ItemDefinition> itemDefinitions ) {
         Inventory startingInventory = new Inventory();
-
         String line = sc.nextLine();
-        while (!line.isEmpty() && sc.hasNextLine()) {
+        
+        do {
             String[] data = line.split(",");
-            String name = data[0].trim();
-            int qty = Integer.valueOf(data[1].trim());
+            String name = parseString(data[0]);
+            int qty = parseInteger(data[1]);
     
             getItemDef(name, itemDefinitions).ifPresentOrElse(
                 (def) -> {
@@ -217,27 +221,10 @@ public class Reader {
                     }
                 },
                 () -> {
-                    System.err.println("Bad starting item '" + name + "' was read. Exiting early");
-                    System.exit(0);
+                    throw new IllegalStateException("Bad starting item '" + name + "' was read. Exiting early");
                 });
             line = sc.nextLine();
-        }
-        // One left behind
-        String[] data = line.split(",");
-        if (!line.isBlank()) {
-            int qty = Integer.valueOf(data[1].trim());
-            getItemDef(data[0], itemDefinitions).ifPresentOrElse(
-                (def) -> {
-                    for (int i = 0; i < qty; i++) {
-                        startingInventory.addOne(def.create());
-                    }
-                },
-                () -> {
-                    System.err.println("Bad starting item '" + data[0] + "' was read. Exiting early");
-                    System.exit(0);
-                });
-        }
-
+        } while (sc.hasNextLine() && !line.isEmpty());
         return startingInventory;
     }
 }

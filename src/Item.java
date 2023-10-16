@@ -13,8 +13,13 @@ public class Item implements ItemInterface {
 
     @Override
     public double getWeight() {
-        double weight = definition.getWeight().orElse(0.0);
-        // If the item is made up of other items, we should find the sum of weights
+        double temp_weight = 0.0;
+        if(!this.definition.isBaseItemDef()){
+            for (String componet : this.getDefinition().getComponent()) {
+                temp_weight = temp_weight + this.getDefinition().getDictionary().defByName(componet).get().getWeight().get();
+            }
+        }
+        double weight = definition.getWeight().orElse(temp_weight);
         return weight;
     }
 
@@ -38,7 +43,8 @@ public class Item implements ItemInterface {
         // For craftable items, this method should return a description describing/listing the
         // other items which make up this item.
         // When a non-empty String is returned, the uncraft button will appear in the UI.
-        return "";
+        
+        return definition.componentsString();
     }
 
     @Override

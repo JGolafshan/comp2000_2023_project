@@ -38,6 +38,20 @@ public class Player {
         return carrying;
     }
 
+    public void craft(ItemDefinition item) throws ItemNotAvailableException {
+        for (String componet : item.getComponent()) {
+            inventory.removeOne(item.getDictionary().defByName(componet).get());   
+        }
+        inventory.addOne(item.create());
+    }
+
+    public void uncraft(Item item) throws ItemNotAvailableException {
+        for (String componet : item.getDefinition().getComponent()) {
+            inventory.addOne(item.getDefinition().getDictionary().defByName(componet).get().create());
+        }
+        inventory.remove(item);
+    }
+
     public void store(ItemInterface item, Storage storage) throws ItemNotAvailableException {
         // Do we have the item we are trying to store
         if (!inventory.searchItems("").contains(item)) {
@@ -56,5 +70,4 @@ public class Player {
         }
         inventory.addOne(storage.retrieve(item));
     }
-    
 }
