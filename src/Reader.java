@@ -27,6 +27,7 @@
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Scanner;
@@ -41,7 +42,7 @@ public class Reader {
     private static final String CRAFTABLE_ITEMS_HEADER = "craftable items";
     private static final String STORE_HEADER = "store";
     private static final String PLAYER_HEADER = "player";
-
+    private static EventManager eventManager = new EventManager();
 
     public static App read(String filePath) {
         File file = new File(filePath);
@@ -54,10 +55,13 @@ public class Reader {
         }
 
         ArrayList<ItemDefinition> itemDefinitions = ItemDictionary.get().getDefs();
-        Storage store = null;
-        //Player player = null;
+        ArrayList<Storage> stores = new ArrayList<>();
+        ArrayList<Player> players = new ArrayList<>();
+        
+        
+        int number_of_players = 2;
         String line = "";
-
+    
         while (scanner.hasNextLine()) {
             line = scanner.nextLine();
             if (!line.isEmpty() && line.charAt(0) == '-') {
@@ -66,17 +70,21 @@ public class Reader {
                 } else if (line.endsWith(CRAFTABLE_ITEMS_HEADER)) {
                     readCraftableItemDefinitions(scanner, itemDefinitions);
                 } else if (line.endsWith(STORE_HEADER)) {
-                    store = readStorage(scanner, itemDefinitions);
+                    stores.add(readStorage(scanner, itemDefinitions));
+                } else if (line.endsWith(STORE_HEADER+"2")) {
+                    stores.add(readStorage(scanner, itemDefinitions));
                 } else if (line.endsWith(PLAYER_HEADER)) {
-                    Player player = readPlayer(scanner, itemDefinitions);
-                    new App(player, store);
-                }
-                else if (line.endsWith("oplayer")) {
-                    Player player1 = readPlayer(scanner, itemDefinitions);
-                    new App(player1, store);
+                     players.add(readPlayer(scanner, itemDefinitions));
+                } else if (line.endsWith(PLAYER_HEADER+"2")) {
+                     players.add(readPlayer(scanner, itemDefinitions));
                 }
             }
         }
+
+        for(int i=0; i < number_of_players; i++){
+            new App(players.get(i), stores.get(i));
+        }
+
         return null;
     }
 
@@ -176,9 +184,9 @@ public class Reader {
     // line format: {STORAGE NAME}, {ITEM NAME}, {QTY}, {ITEM NAME}, {QTY}, ...
     private static Storage readStorage(Scanner sc, ArrayList<ItemDefinition> itemDefinitions) {
         if (Reader.storeRead) {
-            throw new IllegalStateException("Store written twice or more in data file");
+            //throw new IllegalStateException("Store written twice or more in data file");
         }
-        Reader.storeRead = true;
+        //Reader.storeRead = true;
 
         String name = sc.nextLine().trim();
         Inventory startingInventory = readStartingItems(sc, itemDefinitions);
@@ -188,15 +196,15 @@ public class Reader {
 
     // line format; {WEIGHT CAPACITY}, {ITEM NAME}, {QTY}, {ITEM NAME}, {QTY}, ...
     private static Player readPlayer(Scanner sc, ArrayList<ItemDefinition> items) {
-        // if (Reader.playerRead) {
-        //     throw new IllegalStateException("Player written twice or more in data file");
-        // }
-        // Reader.playerRead = true;
-
-        String name = System.getProperty("user.name");
+        if (Reader.playerRead) {
+            //throw new IllegalStateException("Player written twice or more in data file");
+        }
+        //Reader.playerRead = true;
+        int randomNum = ThreadLocalRandom.current().nextInt(0, 999);
+        String name = "Player: "+ randomNum ;
         double carryCapacity = Double.valueOf(sc.nextLine());
         Inventory startingInventory = readStartingItems(sc, items);
-        return new Player(name, carryCapacity, startingInventory);
+        return new Player(name, carryCapacity, startingInventory, eventManager);
     }
 
     /**

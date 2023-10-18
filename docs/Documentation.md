@@ -8,9 +8,18 @@ Behavioural pattern - Options: *Strategy* or *Observer* pattern.
 You chose: <Observer>
 
 ## Itemise changes made (which class files were modified)
-1. The Player class now has an interface (PropertyChangeListener), which checks for changes in the storage 
-2. Storage now used PropertyChangeSupport to send changes to each players storage, also added two functions add and remove Observer.
-3. AddStorageObserver is used in Reader every time a players file is read it add that player to the storage
+1. created a new class EventManager
+2. added import statements to Player.java
+3. created a new field in Player.java callede EventManager
+4. constructor has a new variable that type a eventManager object.
+5. constructor also calls subscribeToEvents();
+6. store now remove the item from the inventory of the person that pressed the store button and send an event to the eventManger ask all the other players to up their storages
+7. retreive now remove the item from the players storage of the person that press the retreive and and sends an event to the eventManager to ask all the other player to update there storage
+8. subscribeToEvents receives the events and then asks all players subscribed to the event to do something.
+9. In reader there is a new feild called eventMaager it is used by all players 
+10. the player name is now "Player" plus a random int value. 
+11. The Player contruct has now be updated with eventManager field
+
 
 # Task 2
 Structural pattern - *Composite* pattern.

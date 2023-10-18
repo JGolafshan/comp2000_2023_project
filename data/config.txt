@@ -11,14 +11,19 @@ The stash
 tomato, 2
 wand, 1
 
+- store2
+The stash
+tomato, 2
+wand, 1
+
+
 - player
 2.0
 magical mace, 1
 rock, 2
 wand, 1
 
-- oplayer
-3.0
-magical mace, 1
+- player2
+2.0
 rock, 2
-wand, 1
+
