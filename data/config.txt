@@ -4,7 +4,7 @@ wand, a magic wand!, 0.35
 rock, rock :D, 0.4
 
 - craftable items
-magical mace, a wand with a rock on one end, wand, rock, tomato
+magical mace, a wand with a rock on one end, rock
 
 - store
 The stash
@@ -16,6 +16,10 @@ The stash
 tomato, 2
 wand, 1
 
+- store3
+The stash
+tomato, 2
+wand, 1
 
 - player
 2.0
@@ -24,6 +28,10 @@ rock, 2
 wand, 1
 
 - player2
+2.0
+rock, 2
+
+- player3
 2.0
 rock, 2
 

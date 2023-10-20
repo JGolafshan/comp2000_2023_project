@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Item implements ItemInterface {
     private ItemDefinition definition;
 
@@ -15,8 +17,8 @@ public class Item implements ItemInterface {
     public double getWeight() {
         double temp_weight = 0.0;
         if(!this.definition.isBaseItemDef()){
-            for (String componet : this.getDefinition().getComponent()) {
-                temp_weight = temp_weight + this.getDefinition().getDictionary().defByName(componet).get().getWeight().get();
+            for (ItemInterface componet : this.getDefinition().getSubComponents()) {
+                temp_weight = temp_weight+ componet.getWeight(); 
             }
         }
         double weight = definition.getWeight().orElse(temp_weight);
@@ -55,6 +57,10 @@ public class Item implements ItemInterface {
     @Override
     public boolean isOf(ItemDefinition def) {
         return getName().equals(def.getName());
+    }
+
+    public void add(ItemInterface item){
+        definition.getSubComponents().add(item);
     }
 
     @Override

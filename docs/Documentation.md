@@ -26,9 +26,10 @@ Structural pattern - *Composite* pattern.
 
 ## Itemise changes made (which class files were modified)
 1. getCompositionDescription() now returns a componentString instead of "", this populates the component box the item is not a base item.
-2. create functions craft and uncraft in the player class
-3. updated app.java functions setCraftAction and setUncraftAction to the respective functions craft() and uncraft()
-4. updated getWeight in player Item class so it returns both the wieght it is a base object or a sum of all object weights
+2. created craftInterface 
+3. created a class craft to handle craft and uncraft
+4. Item now has a new method called add which adds a item to a sub-compoent array
+5. ItemDefinition has two new methods and a new field, subComponets and a get and set for the new field.
 
 # Task 3 
 
@@ -59,24 +60,12 @@ Structural pattern - *Composite* pattern.
 1. 
 
 ## What was changed
-1. 
+1. Used the decorate pattern on on weight.
 
 ## Why it was changed
-1. 
+1. Since itemDefinition is a composite function, its just used to create to pass the items values into Item.
 
 ## The benefits of the change
-1. 
+1. Makes Maintainability easier
+2. Improves consistency 
 
-
-
-## Itemised changes or new files
-1. 
-
-## What was changed
-1. 
-
-## Why it was changed
-1. 
-
-## The benefits of the change
-1. 

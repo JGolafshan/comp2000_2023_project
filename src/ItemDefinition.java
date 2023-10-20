@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Optional;
 
 public class ItemDefinition {
@@ -7,17 +8,18 @@ public class ItemDefinition {
     private boolean isBaseItem;
     private ItemDictionary dict;
     private Optional<Double> weight;
+    private ArrayList<ItemInterface> subComponents;
 
     public ItemDefinition(String n, String desc, Optional<Double> weightIfBase, String[] components) {
         name = n;
         description = desc;
         componentNames = components;
+        subComponents = new ArrayList<>();
         isBaseItem = weightIfBase.isPresent();
         weight = weightIfBase;
         dict = ItemDictionary.get();
         // This may be helpful for the compsite pattern to find the appropriate item definitions
         
-
     }    
 
     /**
@@ -27,6 +29,10 @@ public class ItemDefinition {
      */
     public Item create() {
         Item item = new Item(this);
+        if(getSubComponents().size() == 0){
+            setSubComponents();
+        }
+  
         // An ItemDefinition for a craftable item might follow a similar pattern
         // to how a craftable/composite item looks.
         return item;
@@ -49,6 +55,20 @@ public class ItemDefinition {
 
     public String getDescription() {
         return description;
+    }
+
+    public void setSubComponents(){
+        subComponents.clear();
+        if (!isBaseItemDef()) {
+                for (String componentName : getComponent()) {
+                    ItemInterface component = getDictionary().defByName(componentName).get().create();
+                    subComponents.add(component);
+                }
+            }
+    }
+
+    public ArrayList<ItemInterface> getSubComponents(){
+        return subComponents;
     }
 
     /**

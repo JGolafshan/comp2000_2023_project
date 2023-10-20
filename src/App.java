@@ -50,10 +50,12 @@ public class App {
     }
 
     void setupCrafting(ItemCraftPage page, Player player) {
-        page.setCraftAction((def) -> player.craft(def));
+        page.setCraftAction((def) -> new Craft(player.getInventory()).craft(def));
     }
 
     void setupUncrafting(ProductPage page, Player player) {
-        page.setUncraftAction((item) -> player.uncraft(item));
+        page.setUncraftAction((item) -> new Craft(player.getInventory()).unCraft(item));
     }
+
+
 }

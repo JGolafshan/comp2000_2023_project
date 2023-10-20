@@ -12,7 +12,7 @@ public class Player {
         carryWeightCapacity = carryCapacity;
         inventory = sInventory;
         this.eventManager = eventManager;
-        subscribeToEvents();
+        subscribeToEvents(); // every time a player is created it subscribed to both Item: add and remove
     }
 
     public void setStorageView(Inventory storageInventory) {
@@ -51,7 +51,7 @@ public class Player {
         inventory.remove(item);
         System.out.println(name + " added " + item.getName() + " to their storage.");
         //let the subscribes know something should be updated
-        eventManager.publishEvent("itemAdded", null, item); // Pass both the item and the storage
+        eventManager.publishEvent("itemAdded", null, item);
         
         
     }
@@ -67,7 +67,7 @@ public class Player {
         inventory.addOne(item);
         System.out.println(name + " removed " + item.getName() + " to their storage.");
         //let the subscribes know something should be updated
-        eventManager.publishEvent("itemRemoved", null, item); // Pass both the item and the storage
+        eventManager.publishEvent("itemRemoved", null, item);
         
         
     }
@@ -77,10 +77,6 @@ public class Player {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 ItemInterface newItem = (ItemInterface) evt.getNewValue();
-                //ItemInterface item = (ItemInterface) newItem;
-                //`Inventory storage = (Inventory) evt.getOldValue();
-    
-                // Handle item addition logic
                 System.out.println(name + " received itemAdded event: " + newItem.getName());
                 storageView.addOne(newItem);
     
@@ -88,7 +84,6 @@ public class Player {
                 
             }
         });
-    
         eventManager.subscribe("itemRemoved", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
@@ -98,7 +93,6 @@ public class Player {
                 } catch(ItemNotAvailableException e){
                     System.out.println("Item already Removed");
                 }
-                
                 System.out.println(name + " received itemRemoved event: " + item.getName());
                 
             }

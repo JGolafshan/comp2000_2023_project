@@ -57,9 +57,7 @@ public class Reader {
         ArrayList<ItemDefinition> itemDefinitions = ItemDictionary.get().getDefs();
         ArrayList<Storage> stores = new ArrayList<>();
         ArrayList<Player> players = new ArrayList<>();
-        
-        
-        int number_of_players = 2;
+
         String line = "";
     
         while (scanner.hasNextLine()) {
@@ -73,15 +71,19 @@ public class Reader {
                     stores.add(readStorage(scanner, itemDefinitions));
                 } else if (line.endsWith(STORE_HEADER+"2")) {
                     stores.add(readStorage(scanner, itemDefinitions));
+                }else if (line.endsWith(STORE_HEADER+"3")) {
+                    stores.add(readStorage(scanner, itemDefinitions));
                 } else if (line.endsWith(PLAYER_HEADER)) {
                      players.add(readPlayer(scanner, itemDefinitions));
                 } else if (line.endsWith(PLAYER_HEADER+"2")) {
+                     players.add(readPlayer(scanner, itemDefinitions));
+                }else if (line.endsWith(PLAYER_HEADER+"3")) {
                      players.add(readPlayer(scanner, itemDefinitions));
                 }
             }
         }
 
-        for(int i=0; i < number_of_players; i++){
+        for(int i=0; i < players.size(); i++){
             new App(players.get(i), stores.get(i));
         }
 
