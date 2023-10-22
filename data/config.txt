@@ -4,7 +4,7 @@ wand, a magic wand!, 0.35
 rock, rock :D, 0.4
 
 - craftable items
-magical mace, a wand with a rock on one end, rock
+magical mace, a wand with a rock on one end, rock, wand
 
 - store
 The stash

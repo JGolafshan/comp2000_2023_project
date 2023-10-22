@@ -177,6 +177,7 @@ public class Reader {
             }
 
             ItemDefinition itemDefinition = new ItemDefinition(name, description, Optional.empty(), components);
+
             defs.add(itemDefinition);
             itemLine = sc.nextLine();
         } while (sc.hasNextLine() && !itemLine.isEmpty());
@@ -227,7 +228,15 @@ public class Reader {
             getItemDef(name, itemDefinitions).ifPresentOrElse(
                 (def) -> {
                     for (int i = 0; i < qty; i++) {
-                        startingInventory.addOne(def.create());
+                        if (def.isBaseItemDef()){
+                            startingInventory.addOne(def.create());
+                        } else {
+                            CraftableItem craftableItem = new CraftableItem(def);
+                            
+                            startingInventory.addOne(craftableItem.create());
+                            System.out.println(craftableItem.getSubComponents());
+                        }
+                        
                     }
                 },
                 () -> {

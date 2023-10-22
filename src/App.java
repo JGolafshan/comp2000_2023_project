@@ -49,12 +49,16 @@ public class App {
         }));
     }
 
+    
+
     void setupCrafting(ItemCraftPage page, Player player) {
-        page.setCraftAction((def) -> new Craft(player.getInventory()).craft(def));
+        Craft craftItem = new Craft(player.getInventory());
+        page.setCraftAction((def) -> craftItem.craft(def));
     }
 
     void setupUncrafting(ProductPage page, Player player) {
-        page.setUncraftAction((item) -> new Craft(player.getInventory()).unCraft(item));
+        Craft craftItem = new Craft(player.getInventory());
+        page.setUncraftAction((item) -> craftItem.unCraft(item));
     }
 
 

@@ -27,9 +27,11 @@ Structural pattern - *Composite* pattern.
 ## Itemise changes made (which class files were modified)
 1. getCompositionDescription() now returns a componentString instead of "", this populates the component box the item is not a base item.
 2. created craftInterface 
-3. created a class craft to handle craft and uncraft
-4. Item now has a new method called add which adds a item to a sub-compoent array
-5. ItemDefinition has two new methods and a new field, subComponets and a get and set for the new field.
+3. added an arraylist in Item 
+4. added a field, ArrayList<ItemInterface> subComponents in item.java
+3. created a class Craft.java to handle craft and uncraft
+4. created a CraftableItem.java which inhreties from Item
+5. both SetupCrafting and SetupUncrafting now use the use methods from the Craft.java
 
 # Task 3 
 
@@ -60,12 +62,12 @@ Structural pattern - *Composite* pattern.
 1. 
 
 ## What was changed
-1. Used the decorate pattern on on weight.
+1. 
 
 ## Why it was changed
-1. Since itemDefinition is a composite function, its just used to create to pass the items values into Item.
+1. because it was a bug 
 
 ## The benefits of the change
-1. Makes Maintainability easier
-2. Improves consistency 
+1. Items can now be loaded into a players inventery the the applications and beable to uncraft.
+2. craftable items are created as CraftableItem not Item.
 
