@@ -1,7 +1,4 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Optional;
-
 public class Craft implements CraftInterface {
     private final Inventory inventory;
 
