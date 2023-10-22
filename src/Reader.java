@@ -69,15 +69,7 @@ public class Reader {
                     readCraftableItemDefinitions(scanner, itemDefinitions);
                 } else if (line.endsWith(STORE_HEADER)) {
                     stores.add(readStorage(scanner, itemDefinitions));
-                } else if (line.endsWith(STORE_HEADER+"2")) {
-                    stores.add(readStorage(scanner, itemDefinitions));
-                }else if (line.endsWith(STORE_HEADER+"3")) {
-                    stores.add(readStorage(scanner, itemDefinitions));
                 } else if (line.endsWith(PLAYER_HEADER)) {
-                     players.add(readPlayer(scanner, itemDefinitions));
-                } else if (line.endsWith(PLAYER_HEADER+"2")) {
-                     players.add(readPlayer(scanner, itemDefinitions));
-                }else if (line.endsWith(PLAYER_HEADER+"3")) {
                      players.add(readPlayer(scanner, itemDefinitions));
                 }
             }
@@ -86,7 +78,6 @@ public class Reader {
         for(int i=0; i < players.size(); i++){
             new App(players.get(i), stores.get(i));
         }
-
         return null;
     }
 
@@ -127,7 +118,7 @@ public class Reader {
     // {NAME}, {DESCRIPTION}, {WEIGHT}, ...
     private static void readBaseItemDefinitions(Scanner sc, ArrayList<ItemDefinition> defs) {
         if (Reader.baseItemsRead) {
-            throw new IllegalStateException("Base Items in data file are not stored together");
+            throw new DatabaseReaderException("Base Items in data file are not stored together");
         }
         Reader.baseItemsRead = true;
         
@@ -141,7 +132,7 @@ public class Reader {
 
             // Disallow duplicate item names
             if (Reader.duplicateItemName(name, defs)) {
-                throw new IllegalStateException("The item name" + name + "is used multiple times");
+                throw new DatabaseReaderException("The item name" + name + "is used multiple times");
             }
 
             ItemDefinition def = new ItemDefinition(name, description, Optional.of(weight), new String[0]);
@@ -155,7 +146,7 @@ public class Reader {
     // {NAME}, {DESCRIPTION}, {COMPONENT 1}, {COMPONENT 2}, ...
     private static void readCraftableItemDefinitions(Scanner sc, ArrayList<ItemDefinition> defs) {
         if (Reader.craftableItemsRead) {
-            throw new IllegalStateException("Craftable in data file are not stored together");
+            throw new DatabaseReaderException("Craftable in data file are not stored together");
         }
         Reader.craftableItemsRead = true;
 
@@ -177,7 +168,7 @@ public class Reader {
             }
 
             ItemDefinition itemDefinition = new ItemDefinition(name, description, Optional.empty(), components);
-
+            
             defs.add(itemDefinition);
             itemLine = sc.nextLine();
         } while (sc.hasNextLine() && !itemLine.isEmpty());
@@ -187,9 +178,9 @@ public class Reader {
     // line format: {STORAGE NAME}, {ITEM NAME}, {QTY}, {ITEM NAME}, {QTY}, ...
     private static Storage readStorage(Scanner sc, ArrayList<ItemDefinition> itemDefinitions) {
         if (Reader.storeRead) {
-            //throw new IllegalStateException("Store written twice or more in data file");
+            throw new DatabaseReaderException("Store written twice or more in data file");
         }
-        //Reader.storeRead = true;
+        Reader.storeRead = true;
 
         String name = sc.nextLine().trim();
         Inventory startingInventory = readStartingItems(sc, itemDefinitions);
@@ -200,9 +191,9 @@ public class Reader {
     // line format; {WEIGHT CAPACITY}, {ITEM NAME}, {QTY}, {ITEM NAME}, {QTY}, ...
     private static Player readPlayer(Scanner sc, ArrayList<ItemDefinition> items) {
         if (Reader.playerRead) {
-            //throw new IllegalStateException("Player written twice or more in data file");
+            throw new DatabaseReaderException("Player written twice or more in data file");
         }
-        //Reader.playerRead = true;
+        Reader.playerRead = true;
         int randomNum = ThreadLocalRandom.current().nextInt(0, 999);
         String name = "Player: "+ randomNum ;
         double carryCapacity = Double.valueOf(sc.nextLine());
@@ -229,10 +220,10 @@ public class Reader {
                 (def) -> {
                     for (int i = 0; i < qty; i++) {
                         if (def.isBaseItemDef()){
+
                             startingInventory.addOne(def.create());
                         } else {
                             CraftableItem craftableItem = new CraftableItem(def);
-                            
                             startingInventory.addOne(craftableItem.create());
                             System.out.println(craftableItem.getSubComponents());
                         }

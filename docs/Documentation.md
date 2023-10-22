@@ -1,7 +1,3 @@
-# Bugs/Thigs that need fixing
-1. You can change the text on retrive and store
-2. allow n players to be added
-3. create some kind of default inventery for players
 
 # Task 1
 Behavioural pattern - Options: *Strategy* or *Observer* pattern.
@@ -31,7 +27,7 @@ Structural pattern - *Composite* pattern.
 4. added a field, ArrayList<ItemInterface> subComponents in item.java
 3. created a class Craft.java to handle craft and uncraft
 4. created a CraftableItem.java which inhreties from Item
-5. both SetupCrafting and SetupUncrafting now use the use methods from the Craft.java
+5. both SetupCrafting and SetupUncrafting now use the use methods from the Craft.java in App.java
 
 # Task 3 
 
@@ -43,7 +39,8 @@ Structural pattern - *Composite* pattern.
 3. created functions parseString, parseDouble, parseInteger. 
 4. moved variables declaration of item values togather (name, desc, qty, e.c.t)   for clarity.
 5. refactored readStartingItems function removed reduntent if statment converted while loop to do-while.
-6. added IllegalStateException to code blocks that use system.exit(0) and removed the system.exit(0) from code.
+7. created a new custom exception DatabaseReaderException.java
+6. added a DatabaseReaderException to code blocks that use system.exit(0) and removed the system.exit(0) from code.
 
 ## What was changed
 1. Rewrite Reader.java
@@ -59,7 +56,10 @@ Structural pattern - *Composite* pattern.
 ##   Secound Improvement
 
 ## Itemised changes or new files
-1. 
+1. readStartingItems in reader was changed so that if the Itme def is not a baseitem it created a craftableItem instead
+2. the ArrayList subComponets moved from Item to Item defination 
+3. added a method in Item that gets the subComponets ArrayList form ItemDefinition (getSubComponent)
+4. added a 2 methohs in ItemDefitition, addSubComponent and getSubComponents
 
 ## What was changed
 1. 
@@ -70,4 +70,6 @@ Structural pattern - *Composite* pattern.
 ## The benefits of the change
 1. Items can now be loaded into a players inventery the the applications and beable to uncraft.
 2. craftable items are created as CraftableItem not Item.
+3. weight is also calulated at the start of the application for crafted items.
 
+Note: fix actually introducted  dupication bug. which i did not have to fix. 
