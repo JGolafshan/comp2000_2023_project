@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Optional;
 
 public class CraftableItem extends Item {
@@ -8,17 +7,19 @@ public class CraftableItem extends Item {
 
     public CraftableItem create() {
         CraftableItem item = new CraftableItem(getDefinition());
-        generateSubComponents();
+        generateSubComponents(item);
         return item;
     }
 
-    public void generateSubComponents(){ 
+    public void generateSubComponents(Item item_base){ 
         for (String componentName : this.getDefinition().getComponent()) {
             Optional<ItemDefinition> componentDefOpt = ItemDictionary.get().defByName(componentName);
             if (componentDefOpt.isPresent()) {
                 ItemDefinition componentDef = componentDefOpt.get();
                 Item sub_item = componentDef.create();
-                addSubComponent(sub_item);       
+                item_base.addSubComponent(sub_item);       
+            } else {
+                throw new DatabaseReaderException(componentName+" Not Found");
             }
         }  
     }

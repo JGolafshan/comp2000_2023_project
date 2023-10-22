@@ -164,7 +164,7 @@ public class Reader {
 
             // Disallow duplicate item names
             if (Reader.duplicateItemName(name, defs)) {
-                throw new IllegalStateException("The item"+name+"is defined multiple times");
+                throw new DatabaseReaderException("The item"+name+"is defined multiple times");
             }
 
             ItemDefinition itemDefinition = new ItemDefinition(name, description, Optional.empty(), components);
@@ -220,18 +220,17 @@ public class Reader {
                 (def) -> {
                     for (int i = 0; i < qty; i++) {
                         if (def.isBaseItemDef()){
-
                             startingInventory.addOne(def.create());
                         } else {
-                            CraftableItem craftableItem = new CraftableItem(def);
-                            startingInventory.addOne(craftableItem.create());
-                            System.out.println(craftableItem.getSubComponents());
+                            CraftableItem craftableItem = new CraftableItem(def).create();
+                            startingInventory.addOne(craftableItem);
+                            
                         }
                         
                     }
                 },
                 () -> {
-                    throw new IllegalStateException("Bad starting item '" + name + "' was read. Exiting early");
+                    throw new DatabaseReaderException("Bad starting item '" + name + "' was read. Exiting early");
                 });
             line = sc.nextLine();
         } while (sc.hasNextLine() && !line.isEmpty());

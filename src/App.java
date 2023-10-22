@@ -18,8 +18,8 @@ public class App {
         setupSearching((InventoryPage) manager.findPage("Storage"));
 
         // Setup of craftng
-        setupCrafting((ItemCraftPage) manager.findPage("Item Crafting"), player);
-        setupUncrafting((ProductPage) manager.findPage("Product Page"), player);
+        setupCrafting((ItemCraftPage) manager.findPage("Item Crafting"));
+        setupUncrafting((ProductPage) manager.findPage("Product Page"));
 
         // Window creation
         manager.refresh();
@@ -49,15 +49,13 @@ public class App {
         }));
     }
 
-    
-
-    void setupCrafting(ItemCraftPage page, Player player) {
-        Craft craftItem = new Craft(player.getInventory());
+    void setupCrafting(ItemCraftPage page) {
+        Craft craftItem = new Craft(page.player.getInventory());
         page.setCraftAction((def) -> craftItem.craft(def));
     }
 
-    void setupUncrafting(ProductPage page, Player player) {
-        Craft craftItem = new Craft(player.getInventory());
+    void setupUncrafting(ProductPage page) {
+        Craft craftItem = new Craft(page.player.getInventory());
         page.setUncraftAction((item) -> craftItem.unCraft(item));
     }
 

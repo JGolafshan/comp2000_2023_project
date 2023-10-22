@@ -1,51 +1,41 @@
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Optional;
-public class Craft implements CraftInterface {
-    private Inventory inventory;
 
-    public Craft(Inventory select_inventory) {
-        inventory = select_inventory;
+public class Craft implements CraftInterface {
+    private final Inventory inventory;
+
+    public Craft(Inventory inventory) {
+        this.inventory = inventory;
     }
 
     public void craft(ItemDefinition itemDefinition) throws ItemNotAvailableException {
-        // Create a CraftableItem from the item definition
         CraftableItem craftableItem = new CraftableItem(itemDefinition);
-    
-        // Get the sub-components required to craft the item
-        String[] componentNames = itemDefinition.getComponent();
-    
-        for (String componentName : componentNames) {
-            // Find the corresponding item definition for the component
-            Optional<ItemDefinition> componentDefOpt = ItemDictionary.get().defByName(componentName);
-            if (componentDefOpt.isPresent()) {
-                ItemDefinition componentDef = componentDefOpt.get();
-                try{
-                    // Retrieve the component item from the player's inventory
-                    ItemInterface componentItem = inventory.removeOne(componentDef);
-                    // Add the component to the craftable item
-                    craftableItem.addSubComponent(componentItem);
-                    // Remove the component from the inventory
-
-                } catch (ItemNotAvailableException e){
-                    for (ItemInterface item : craftableItem.getSubComponents()) {
-                        inventory.addOne(item);
-                    }
-                    throw new ItemNotAvailableException(componentDef);
-                }
+        
+        for (String componentName : itemDefinition.getComponent()) {
+            ArrayList<ItemInterface> items_in_inventory = inventory.searchItems(componentName);
+            if(!items_in_inventory.isEmpty()){
+                ItemDefinition item_found = items_in_inventory.get(0).getDefinition();
+                ItemInterface componentItem = inventory.removeOne(item_found);
+                craftableItem.addSubComponent(componentItem);
+            } else {
+                returnItemsToInventory(craftableItem.getSubComponents());
+                throw new DatabaseReaderException(componentName+" Not Found");
             }
         }
-        // Add the crafted item to the inventory
         inventory.addOne(craftableItem);
     }
 
     @Override
     public void unCraft(Item item) throws ItemNotAvailableException {
         CraftableItem craftableItem = (CraftableItem) item;
-        // Remove sub-components from the crafted item and add them back to the inventory
-        for (ItemInterface component : craftableItem.getSubComponents()) {
-
-            inventory.addOne(component);
-        }
-        // Remove the crafted item from the inventory
+        returnItemsToInventory(craftableItem.getSubComponents());
         inventory.remove(item);
+    }
+
+    private void returnItemsToInventory(Iterable<ItemInterface> items) {
+        for (ItemInterface item : items) {
+            inventory.addOne(item);
+        }
     }
 }
